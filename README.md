@@ -116,3 +116,22 @@ automation-framework
 
 - Juice Shop veb-səhifə versiyaları arasında kiçik fərqlər ola bilər. Test element tapa bilmirsə, locator-ları `pages` paketindəki sabitlərdə yoxlayın (brauzerdə F12).
 - Juice Shop qəsdən zəif qurulmuş tətbiqdir, yalnız lokal və test məqsədli istifadə edin.
+
+## Locator-ları yoxlamaq (köməkçi alət)
+
+Juice Shop-un versiyası dəyişəndə locator-lar köhnələ bilər. Bütün səhifələrin real DOM-unu yığmaq üçün:
+
+```bash
+mvn clean test -Dtest=DomSnapshotTest -Dbrowser=chrome -Dheadless=false
+```
+
+Nəticə `target/dom-snapshots/` qovluğundadır (`index.txt`, hər səhifə üçün `.html` və `.png`).
+
+## TestNG lifecycle annotasiyaları
+
+| Annotasiya | Harada | Nə edir |
+|---|---|---|
+| `@BeforeSuite` / `@AfterSuite` | `BaseTest` | Juice Shop-un işlədiyini yoxlayır / suite bitişini bildirir |
+| `@BeforeClass` | `BaseUiTest`, `AuthenticatedUiTest`, `BasketApiTests`, `UserApiTests` | API ilə test istifadəçisi yaradır, login edir |
+| `@AfterClass` | `BaseUiTest`, `AuthenticatedUiTest`, `BasketApiTests` | Səbəti təmizləyir, qalmış brauzeri bağlayır, istifadəçi məlumatını sıfırlayır |
+| `@BeforeMethod` / `@AfterMethod` | `BaseUiTest`, `AuthenticatedUiTest`, `BasketApiTests` | Brauzer açır/bağlayır, UI login, səbət təmizləmə |

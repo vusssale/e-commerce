@@ -3,6 +3,7 @@ package api;
 import base.BaseTest;
 import io.restassured.response.Response;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -27,6 +28,14 @@ public class BasketApiTests extends BaseTest {
     @BeforeMethod(alwaysRun = true)
     public void emptyBasket() {
         api.clearBasket(session);
+    }
+
+    /** Sinif bitəndə səbət təmizlənir, test məlumatı qalmır. */
+    @AfterClass(alwaysRun = true)
+    public void clearBasketAfterClass() {
+        if (session != null) {
+            api.clearBasket(session);
+        }
     }
 
     @Test(groups = "regression", description = "GET /rest/basket/{id}")

@@ -1,6 +1,7 @@
 package ui;
 
 import api.ApiClient;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
@@ -19,5 +20,13 @@ public abstract class AuthenticatedUiTest extends BaseUiTest {
         api.clearBasket(session);
         loginPage.open();
         loginPage.loginSuccessfully(user.email(), user.password());
+    }
+
+    /** Sinifin bütün testləri bitəndə test istifadəçisinin səbəti API ilə təmizlənir. */
+    @AfterClass(alwaysRun = true)
+    public void clearBasketAfterClass() {
+        if (session != null) {
+            api.clearBasket(session);
+        }
     }
 }
