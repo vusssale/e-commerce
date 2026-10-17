@@ -4,39 +4,67 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>az.learning</groupId>
-    <artifactId>e-commerce</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>com.qa</groupId>
+    <artifactId>automation-framework</artifactId>
+    <version>1.0.0</version>
+    <name>automation-framework</name>
 
     <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <selenium.version>4.51.0</selenium.version>
+        <restassured.version>6.0.1</restassured.version>
+        <testng.version>7.11.0</testng.version>
+        <jackson.version>2.22.3</jackson.version>
+
+        <!-- Hansı TestNG suite faylı işə düşsün: mvn test -DsuiteXmlFile=testng-smoke.xml -->
+        <suiteXmlFile>testng.xml</suiteXmlFile>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${restassured.version}</version>
+        </dependency>
+
+        <!-- Rest Assured Map/obyekt body-ni JSON-a çevirmək üçün lazımdır -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.6.4</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
                 <configuration>
-                    <mainClass>az.learning.Main</mainClass>
-                    <arguments>
-                        <argument>argument1</argument>
-                    </arguments>
-                    <systemProperties>
-                        <systemProperty>
-                            <key>myproperty</key>
-                            <value>myvalue</value>
-                        </systemProperty>
-                    </systemProperties>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
+                    </suiteXmlFiles>
                 </configuration>
             </plugin>
         </plugins>
