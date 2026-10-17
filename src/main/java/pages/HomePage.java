@@ -2,30 +2,31 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
-import org.openqa.selenium.Keys;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 
 /**
  * Ana səhifə / məhsul siyahısı (Juice Shop "search" səhifəsi).
  *
- * Locator-lar Juice Shop-un Angular frontend-inə görə yazılıb. Tətbiqin versiyası fərqlidirsə
- * və test element tapa bilmirsə, brauzerdə F12 ilə elementi yoxlayıb aşağıdakı sabitləri düzəldin.
+ * Aşağıdakı locator-lar real DOM-dan (Juice Shop, Angular 22 versiyası) götürülüb:
+ *   app-product > mat-card > article > section[aria-label="Click for more information about the product"]
+ *   .name (məhsulun adı), .price (qiymət), button[aria-label="Add to Basket"], .warn-notification (səbət sayğacı)
  */
 public class HomePage extends BasePage {
 
-    private static final By PRODUCT_TILE = By.cssSelector("mat-grid-tile");
-    private static final By PRODUCT_NAME = By.cssSelector("mat-grid-tile .item-name");
-    private static final By ACCOUNT_BUTTON = By.id("navbarAccount");
-    private static final By LOGOUT_BUTTON = By.id("navbarLogoutButton");
-    private static final By SNACKBAR = By.cssSelector("simple-snack-bar, .mat-mdc-snack-bar-container");
+    private static final By PRODUCT_CARD = By.cssSelector("app-product");
+    private static final By PRODUCT_NAME = By.cssSelector("app-product .name");
+    private static final By BASKET_COUNTER = By.cssSelector(".warn-notification");
     private static final By WELCOME_CLOSE = By.cssSelector("button[aria-label='Close Welcome Banner']");
     private static final By COOKIE_DISMISS = By.cssSelector("a[aria-label='dismiss cookie message']");
 
@@ -46,7 +47,7 @@ public class HomePage extends BasePage {
             // cookie qoyulmasa, aşağıdakı dismissOverlays() pəncərələri əl ilə bağlayacaq
         }
         driver.navigate().refresh();
-        waitVisible(PRODUCT_TILE);
+        waitVisible(PRODUCT_CARD);
         dismissOverlays();
         return this;
     }
@@ -56,7 +57,7 @@ public class HomePage extends BasePage {
         String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8).replace("+", "%20");
         driver.get(baseUrl + "/#/search?q=" + encoded);
         driver.navigate().refresh();
-        waitVisible(PRODUCT_TILE);
+        waitVisible(PRODUCT_CARD);
         dismissOverlays();
         return this;
     }
@@ -69,55 +70,65 @@ public class HomePage extends BasePage {
                 .toList();
     }
 
+    /** Məsələn "1.99¤". */
     public String getProductPriceText(String productName) {
-        WebElement tile = waitVisible(tileByName(productName));
-        return tile.findElement(By.cssSelector(".item-price")).getText().trim();
+        WebElement card = waitVisible(cardByName(productName));
+        return card.findElement(By.cssSelector(".price")).getText().trim();
     }
 
-    /** Məhsulun "detallar" pəncərəsini açır. */
+    /** Məhsulun "detallar" pəncərəsini açır (kartın üst hissəsinə klik). */
     public ProductPage openProductDetails(String productName) {
-        WebElement tile = waitVisible(tileByName(productName));
-        List<WebElement> infoButtons = tile.findElements(
-                By.cssSelector("button[aria-label='Click for more information about the product']"));
-        if (!infoButtons.isEmpty()) {
-            wait.until(ExpectedConditions.elementToBeClickable(infoButtons.get(0))).click();
-        } else {
-            tile.findElement(By.cssSelector("img")).click();
-        }
+        WebElement card = waitVisible(cardByName(productName));
+        WebElement details = card.findElement(
+                By.cssSelector("section[aria-label='Click for more information about the product']"));
+        wait.until(ExpectedConditions.elementToBeClickable(details)).click();
         return new ProductPage(driver);
     }
 
-    /**
-     * Məhsulu səbətə əlavə edir (yalnız login olmuş istifadəçi üçün düymə görünür).
-     *
-     * @return ekranda çıxan təsdiq mesajı (məsələn "Placed Apple Juice (1000ml) into basket.")
-     */
-    public String addToBasket(String productName) {
-        WebElement tile = waitVisible(tileByName(productName));
-        WebElement button = tile.findElement(By.cssSelector("button[aria-label='Add to Basket']"));
+    /** Məhsulu səbətə əlavə edir və səbət sayğacının yenilənməsini (ən çox 3 saniyə) gözləyir. */
+    public void addToBasket(String productName) {
+        WebElement card = waitVisible(cardByName(productName));
+        int before = getBasketCount();
+        WebElement button = card.findElement(By.cssSelector("button[aria-label='Add to Basket']"));
         wait.until(ExpectedConditions.elementToBeClickable(button)).click();
-
-        String message = waitVisible(SNACKBAR).getText().trim();
-        // növbəti əlavə etmədən əvvəl bildirişin yox olmasını gözləyirik
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(SNACKBAR));
-        return message;
-    }
-
-    /** Hesab menyusunu açıb "Logout" düyməsinin olub-olmadığına baxır. */
-    public boolean isUserLoggedIn() {
-        click(ACCOUNT_BUTTON);
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(LOGOUT_BUTTON));
-            return true;
-        } catch (TimeoutException e) {
-            return false;
-        } finally {
-            driver.findElement(By.tagName("body")).sendKeys(Keys.ESCAPE);
+            new WebDriverWait(driver, Duration.ofSeconds(3)).until(d -> getBasketCount() != before);
+        } catch (TimeoutException ignored) {
+            // sayğac dəyişməyə bilər (eyni məhsulun sayı artanda), sorğunun bitməsi üçün 3 san. kifayətdir
         }
     }
 
-    private By tileByName(String productName) {
-        return By.xpath("//mat-grid-tile[.//div[contains(@class,'item-name') "
+    /** Yuxarı menyudakı "Your Basket" yanındakı rəqəm. */
+    public int getBasketCount() {
+        List<WebElement> counters = driver.findElements(BASKET_COUNTER);
+        if (counters.isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(counters.get(0).getText().trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * İstifadəçi login olub? Tətbiqin özü login-dən sonra JWT token-i localStorage-də
+     * və "token" cookie-sində saxlayır, ona görə onu yoxlayırıq.
+     */
+    public boolean isUserLoggedIn() {
+        try {
+            wait.until(d -> {
+                Object token = ((JavascriptExecutor) d).executeScript("return window.localStorage.getItem('token');");
+                return token != null || d.manage().getCookieNamed("token") != null;
+            });
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    private By cardByName(String productName) {
+        return By.xpath("//app-product[.//div[contains(concat(' ', normalize-space(@class), ' '), ' name ') "
                 + "and contains(normalize-space(.), '" + productName + "')]]");
     }
 

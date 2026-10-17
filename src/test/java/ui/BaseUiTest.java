@@ -34,9 +34,13 @@ public abstract class BaseUiTest extends BaseTest {
     public void setUpBrowser() {
         DriverManager.initDriver();
         driver = DriverManager.getDriver();
-        homePage = new HomePage(driver).open();
+
+        // Page Object-lər əvvəl yaradılır ki, açılış uğursuz olsa belə null qalmasınlar
+        homePage = new HomePage(driver);
         loginPage = new LoginPage(driver);
         cartPage = new CartPage(driver);
+
+        homePage.open();
     }
 
     @AfterMethod(alwaysRun = true)

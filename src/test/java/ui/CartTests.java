@@ -25,10 +25,9 @@ public class CartTests extends AuthenticatedUiTest {
     public void addProductToCartTest() {
         homePage.searchFor(product.name());
 
-        String message = homePage.addToBasket(product.name());
+        homePage.addToBasket(product.name());
 
-        Assert.assertTrue(message.toLowerCase().contains(product.name().toLowerCase()),
-                "Təsdiq mesajında məhsulun adı olmalı idi, amma: '" + message + "'");
+        Assert.assertTrue(homePage.getBasketCount() >= 1, "Səbət sayğacı 1 və ya daha çox olmalı idi");
         Assert.assertTrue(api.getBasketProductNames(session).contains(product.name()),
                 "Məhsul serverdəki səbətdə də olmalı idi");
     }
