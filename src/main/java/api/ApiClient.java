@@ -1,5 +1,6 @@
 package api;
 
+import constants.Constants;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -34,13 +35,15 @@ public class ApiClient {
                 .accept(ContentType.JSON);
     }
 
-    private static RequestSpecification auth(AuthSession session) {
+    private static RequestSpecification auth(AuthSession session) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return spec().header("Authorization", "Bearer " + session.token());
     }
 
     // ---------------------------------------------------------------- users
 
-    public Response register(String email, String password) {
+    public Response register(String email, String password) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return spec()
                 .body(Map.of(
                         "email", email,
@@ -50,7 +53,8 @@ public class ApiClient {
     }
 
     /** Yeni istifadəçi yaradır (201 gözlənilir) və məlumatlarını qaytarır. */
-    public TestUser createUser() {
+    public TestUser createUser() throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         TestUser user = TestDataGenerator.newUser();
         Response response = register(user.email(), user.password());
         if (response.statusCode() != 201) {
@@ -60,13 +64,15 @@ public class ApiClient {
         return user;
     }
 
-    public Response login(String email, String password) {
+    public Response login(String email, String password) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return spec()
                 .body(Map.of("email", email, "password", password))
                 .post("/rest/user/login");
     }
 
-    public AuthSession loginAndGetSession(TestUser user) {
+    public AuthSession loginAndGetSession(TestUser user) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         Response response = login(user.email(), user.password());
         if (response.statusCode() != 200) {
             throw new IllegalStateException("Login uğursuz oldu. status="
@@ -81,19 +87,23 @@ public class ApiClient {
 
     // ------------------------------------------------------------- products
 
-    public Response getProducts() {
+    public Response getProducts() throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return spec().get("/api/Products");
     }
 
-    public Response getProduct(int id) {
+    public Response getProduct(int id) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return spec().get("/api/Products/{id}", id);
     }
 
-    public Response searchProducts(String query) {
+    public Response searchProducts(String query) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return spec().queryParam("q", query).get("/rest/products/search");
     }
 
-    public ProductInfo getProductInfo(int id) {
+    public ProductInfo getProductInfo(int id) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         Response response = getProduct(id);
         if (response.statusCode() != 200) {
             throw new IllegalStateException("Məhsul oxunmadı. id=" + id + ", status=" + response.statusCode());
@@ -104,11 +114,13 @@ public class ApiClient {
 
     // --------------------------------------------------------------- basket
 
-    public Response getBasket(AuthSession session) {
+    public Response getBasket(AuthSession session) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return auth(session).get("/rest/basket/{id}", session.basketId());
     }
 
-    public Response addToBasket(AuthSession session, int productId, int quantity) {
+    public Response addToBasket(AuthSession session, int productId, int quantity) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return auth(session)
                 .body(Map.of(
                         "ProductId", productId,
@@ -117,23 +129,26 @@ public class ApiClient {
                 .post("/api/BasketItems");
     }
 
-    public Response updateBasketItem(AuthSession session, int basketItemId, int quantity) {
+    public Response updateBasketItem(AuthSession session, int basketItemId, int quantity) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return auth(session)
                 .body(Map.of("quantity", quantity))
                 .put("/api/BasketItems/{id}", basketItemId);
     }
 
-    public Response deleteBasketItem(AuthSession session, int basketItemId) {
+    public Response deleteBasketItem(AuthSession session, int basketItemId) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return auth(session).delete("/api/BasketItems/{id}", basketItemId);
     }
 
-    public List<String> getBasketProductNames(AuthSession session) {
+    public List<String> getBasketProductNames(AuthSession session) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         List<String> names = getBasket(session).jsonPath().getList("data.Products.name");
         return names == null ? List.of() : names;
     }
 
     /** Səbətdəki bütün məhsulları silir (testlər təmiz vəziyyətdən başlasın deyə). */
-    public void clearBasket(AuthSession session) {
+    public void clearBasket(AuthSession session) throws InterruptedException {
         List<Integer> itemIds = getBasket(session).jsonPath().getList("data.Products.BasketItem.id");
         if (itemIds != null) {
             for (Integer id : itemIds) {

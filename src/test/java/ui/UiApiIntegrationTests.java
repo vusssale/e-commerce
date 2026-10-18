@@ -10,7 +10,7 @@ import utils.TestUser;
 public class UiApiIntegrationTests extends BaseUiTest {
 
     @Test(groups = {"smoke", "regression"}, description = "API ilə yaradılan istifadəçi UI-da login edir")
-    public void userCreatedViaApiCanLoginInUiTest() {
+    public void userCreatedViaApiCanLoginInUiTest() throws InterruptedException {
         // API: yeni istifadəçi
         TestUser newUser = api.createUser();
         Assert.assertEquals(api.login(newUser.email(), newUser.password()).statusCode(), 200,
@@ -24,7 +24,7 @@ public class UiApiIntegrationTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", description = "API ilə səbətə əlavə olunan məhsul UI-da görünür")
-    public void productAddedViaApiIsVisibleInUiCartTest() {
+    public void productAddedViaApiIsVisibleInUiCartTest() throws InterruptedException {
         // API: istifadəçi + səbətə 2 ədəd məhsul
         TestUser newUser = api.createUser();
         ApiClient.AuthSession session = api.loginAndGetSession(newUser);

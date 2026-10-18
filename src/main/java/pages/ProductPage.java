@@ -18,7 +18,7 @@ public class ProductPage extends BasePage {
         try {
             waitVisible(DIALOG);
             return true;
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | InterruptedException e) {
             return false;
         }
     }

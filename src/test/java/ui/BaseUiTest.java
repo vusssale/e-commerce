@@ -27,12 +27,12 @@ public abstract class BaseUiTest extends BaseTest {
     protected TestUser user;
 
     @BeforeClass(alwaysRun = true)
-    public void createUserViaApi() {
+    public void createUserViaApi() throws InterruptedException {
         user = api.createUser();
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void setUpBrowser() {
+    public void setUpBrowser() throws InterruptedException {
         DriverManager.initDriver();
         driver = DriverManager.getDriver();
 

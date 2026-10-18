@@ -38,7 +38,7 @@ public class HomePage extends BasePage {
      * Tətbiqi açır. "Welcome" pəncərəsi və cookie bildirişi testləri bloklamasın deyə
      * müvafiq cookie-lər əvvəlcədən qoyulur.
      */
-    public HomePage open() {
+    public HomePage open() throws InterruptedException {
         driver.get(baseUrl);
         try {
             driver.manage().addCookie(new Cookie("welcomebanner_status", "dismiss"));
@@ -53,7 +53,7 @@ public class HomePage extends BasePage {
     }
 
     /** Axtarışı URL vasitəsilə edir və səhifəni yeniləyir (köhnə nəticələr qarışmasın deyə). */
-    public HomePage searchFor(String query) {
+    public HomePage searchFor(String query) throws InterruptedException {
         String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8).replace("+", "%20");
         driver.get(baseUrl + "/#/search?q=" + encoded);
         driver.navigate().refresh();
@@ -62,7 +62,7 @@ public class HomePage extends BasePage {
         return this;
     }
 
-    public List<String> getProductNames() {
+    public List<String> getProductNames() throws InterruptedException {
         waitVisible(PRODUCT_NAME);
         return driver.findElements(PRODUCT_NAME).stream()
                 .map(e -> e.getText().trim())
@@ -71,13 +71,13 @@ public class HomePage extends BasePage {
     }
 
     /** Məsələn "1.99¤". */
-    public String getProductPriceText(String productName) {
+    public String getProductPriceText(String productName) throws InterruptedException {
         WebElement card = waitVisible(cardByName(productName));
         return card.findElement(By.cssSelector(".price")).getText().trim();
     }
 
     /** Məhsulun "detallar" pəncərəsini açır (kartın üst hissəsinə klik). */
-    public ProductPage openProductDetails(String productName) {
+    public ProductPage openProductDetails(String productName) throws InterruptedException {
         WebElement card = waitVisible(cardByName(productName));
         WebElement details = card.findElement(
                 By.cssSelector("section[aria-label='Click for more information about the product']"));
@@ -86,7 +86,7 @@ public class HomePage extends BasePage {
     }
 
     /** Məhsulu səbətə əlavə edir və səbət sayğacının yenilənməsini (ən çox 3 saniyə) gözləyir. */
-    public void addToBasket(String productName) {
+    public void addToBasket(String productName) throws InterruptedException {
         WebElement card = waitVisible(cardByName(productName));
         int before = getBasketCount();
         WebElement button = card.findElement(By.cssSelector("button[aria-label='Add to Basket']"));

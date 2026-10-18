@@ -1,5 +1,6 @@
 package pages;
 
+import constants.Constants;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -21,7 +22,8 @@ public abstract class BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.timeoutSeconds()));
     }
 
-    protected WebElement waitVisible(By locator) {
+    protected WebElement waitVisible(By locator) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout/2);
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
@@ -29,13 +31,15 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
-    protected void type(By locator, String text) {
+    protected void type(By locator, String text) throws InterruptedException {
         WebElement element = waitVisible(locator);
         element.clear();
         element.sendKeys(text);
+        Thread.sleep(Constants.ActionTimeout);
     }
 
-    protected String getText(By locator) {
+    protected String getText(By locator) throws InterruptedException {
+        Thread.sleep(Constants.ActionTimeout);
         return waitVisible(locator).getText().trim();
     }
 }

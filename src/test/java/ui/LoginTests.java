@@ -7,7 +7,7 @@ import utils.TestDataGenerator;
 public class LoginTests extends BaseUiTest {
 
     @Test(groups = {"smoke", "regression"}, description = "Valid credentials ilə login")
-    public void validLoginTest() {
+    public void validLoginTest() throws InterruptedException {
         loginPage.open();
         loginPage.loginSuccessfully(user.email(), user.password());
 
@@ -15,7 +15,7 @@ public class LoginTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", description = "Mövcud olmayan istifadəçi ilə login (negative)")
-    public void invalidUsernameLoginTest() {
+    public void invalidUsernameLoginTest() throws InterruptedException {
         loginPage.open();
         loginPage.login(TestDataGenerator.randomEmail(), user.password());
 
@@ -25,7 +25,7 @@ public class LoginTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", description = "Yanlış parol ilə login (negative)")
-    public void invalidPasswordLoginTest() {
+    public void invalidPasswordLoginTest() throws InterruptedException {
         loginPage.open();
         loginPage.login(user.email(), "YanlisParol!999");
 
@@ -35,7 +35,7 @@ public class LoginTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", description = "Boş sahələrlə login (negative)")
-    public void emptyFieldsLoginTest() {
+    public void emptyFieldsLoginTest() throws InterruptedException {
         loginPage.open();
 
         Assert.assertFalse(loginPage.isLoginButtonEnabled(),

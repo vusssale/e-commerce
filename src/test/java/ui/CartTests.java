@@ -10,11 +10,11 @@ public class CartTests extends AuthenticatedUiTest {
     private ApiClient.ProductInfo product;
 
     @BeforeClass(alwaysRun = true)
-    public void loadProductFromApi() {
+    public void loadProductFromApi() throws InterruptedException {
         product = api.getProductInfo(1);
     }
 
-    private void addProductViaUi(int times) {
+    private void addProductViaUi(int times) throws InterruptedException {
         homePage.searchFor(product.name());
         for (int i = 0; i < times; i++) {
             homePage.addToBasket(product.name());
@@ -22,7 +22,7 @@ public class CartTests extends AuthenticatedUiTest {
     }
 
     @Test(groups = {"smoke", "regression"}, description = "Məhsulun səbətə əlavə edilməsi")
-    public void addProductToCartTest() {
+    public void addProductToCartTest() throws InterruptedException {
         homePage.searchFor(product.name());
 
         homePage.addToBasket(product.name());
@@ -33,7 +33,7 @@ public class CartTests extends AuthenticatedUiTest {
     }
 
     @Test(groups = {"smoke", "regression"}, description = "Məhsul səbətdə görünür")
-    public void productAppearsInCartTest() {
+    public void productAppearsInCartTest() throws InterruptedException {
         addProductViaUi(1);
 
         cartPage.open();
@@ -42,7 +42,7 @@ public class CartTests extends AuthenticatedUiTest {
     }
 
     @Test(groups = "regression", description = "Məhsulun sayı (quantity)")
-    public void cartQuantityTest() {
+    public void cartQuantityTest() throws InterruptedException {
         addProductViaUi(2);
 
         cartPage.open();
@@ -51,7 +51,7 @@ public class CartTests extends AuthenticatedUiTest {
     }
 
     @Test(groups = "regression", description = "Səbətin ümumi qiyməti")
-    public void cartTotalTest() {
+    public void cartTotalTest() throws InterruptedException {
         addProductViaUi(2);
 
         cartPage.open();
@@ -62,7 +62,7 @@ public class CartTests extends AuthenticatedUiTest {
     }
 
     @Test(groups = "regression", description = "Məhsulun səbətdən silinməsi")
-    public void removeProductFromCartTest() {
+    public void removeProductFromCartTest() throws InterruptedException {
         addProductViaUi(1);
         cartPage.open();
         Assert.assertTrue(cartPage.isProductInCart(product.name()), "Əvvəlcə məhsul səbətdə olmalıdır");

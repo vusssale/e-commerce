@@ -13,7 +13,7 @@ public class ProductApiTests extends BaseTest {
     private final ApiClient api = new ApiClient();
 
     @Test(groups = {"smoke", "regression"}, description = "GET /api/Products")
-    public void getAllProductsTest() {
+    public void getAllProductsTest() throws InterruptedException {
         api.getProducts().then()
                 .statusCode(200)
                 .header("Content-Type", containsString("application/json"))   // header validation
@@ -23,7 +23,7 @@ public class ProductApiTests extends BaseTest {
     }
 
     @Test(groups = "regression", description = "GET /api/Products/1")
-    public void getProductByIdTest() {
+    public void getProductByIdTest() throws InterruptedException {
         Response response = api.getProduct(1);
 
         response.then()
@@ -34,7 +34,7 @@ public class ProductApiTests extends BaseTest {
     }
 
     @Test(groups = "regression", description = "GET /rest/products/search?q=apple")
-    public void searchProductsTest() {
+    public void searchProductsTest() throws InterruptedException {
         api.searchProducts("apple").then()
                 .statusCode(200)
                 .body("data", hasSize(greaterThan(0)))

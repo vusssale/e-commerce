@@ -15,7 +15,7 @@ public class ProductTests extends BaseUiTest {
     private ApiClient.ProductInfo product;
 
     @BeforeClass(alwaysRun = true)
-    public void loadProductFromApi() {
+    public void loadProductFromApi() throws InterruptedException {
         product = api.getProductInfo(1);
     }
 
@@ -25,7 +25,7 @@ public class ProductTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", dataProvider = "searchTerms", description = "Məhsul axtarışı")
-    public void searchShowsMatchingProducts(String term) {
+    public void searchShowsMatchingProducts(String term) throws InterruptedException {
         homePage.searchFor(term);
 
         List<String> names = homePage.getProductNames();
@@ -35,7 +35,7 @@ public class ProductTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", description = "Məhsulun detallar pəncərəsi")
-    public void productDetailsAreDisplayed() {
+    public void productDetailsAreDisplayed() throws InterruptedException {
         homePage.searchFor(product.name());
         ProductPage productPage = homePage.openProductDetails(product.name());
 
@@ -45,7 +45,7 @@ public class ProductTests extends BaseUiTest {
     }
 
     @Test(groups = "regression", description = "UI-dakı qiymət API-dəki qiymətlə eynidir")
-    public void productPriceMatchesApi() {
+    public void productPriceMatchesApi() throws InterruptedException {
         homePage.searchFor(product.name());
 
         double uiPrice = ParseUtils.parsePrice(homePage.getProductPriceText(product.name()));

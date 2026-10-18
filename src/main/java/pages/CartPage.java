@@ -37,7 +37,7 @@ public class CartPage extends BasePage {
         }
     }
 
-    public int getQuantity(String productName) {
+    public int getQuantity(String productName) throws InterruptedException {
         WebElement row = waitVisible(rowByName(productName));
         String text = row.findElement(By.cssSelector(".mat-column-quantity")).getText();
         return ParseUtils.parseInt(text);
@@ -54,7 +54,7 @@ public class CartPage extends BasePage {
     }
 
     /** Məhsulun sətrindəki sonuncu düyməni (silmə düyməsi) sıxır və sətrin yox olmasını gözləyir. */
-    public void removeProduct(String productName) {
+    public void removeProduct(String productName) throws InterruptedException {
         WebElement row = waitVisible(rowByName(productName));
         List<WebElement> buttons = row.findElements(By.tagName("button"));
         wait.until(ExpectedConditions.elementToBeClickable(buttons.get(buttons.size() - 1))).click();

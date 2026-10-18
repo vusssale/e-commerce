@@ -11,12 +11,12 @@ public abstract class AuthenticatedUiTest extends BaseUiTest {
     protected ApiClient.AuthSession session;
 
     @BeforeClass(alwaysRun = true)
-    public void loginViaApi() {
+    public void loginViaApi() throws InterruptedException {
         session = api.loginAndGetSession(user);
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void loginViaUi() {
+    public void loginViaUi() throws InterruptedException {
         api.clearBasket(session);
         loginPage.open();
         loginPage.loginSuccessfully(user.email(), user.password());
@@ -24,7 +24,7 @@ public abstract class AuthenticatedUiTest extends BaseUiTest {
 
     /** Sinifin bütün testləri bitəndə test istifadəçisinin səbəti API ilə təmizlənir. */
     @AfterClass(alwaysRun = true)
-    public void clearBasketAfterClass() {
+    public void clearBasketAfterClass() throws InterruptedException {
         if (session != null) {
             api.clearBasket(session);
         }

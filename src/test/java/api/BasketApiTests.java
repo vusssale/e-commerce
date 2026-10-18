@@ -19,27 +19,27 @@ public class BasketApiTests extends BaseTest {
     private ApiClient.ProductInfo product;
 
     @BeforeClass(alwaysRun = true)
-    public void prepare() {
+    public void prepare() throws InterruptedException {
         TestUser user = api.createUser();
         session = api.loginAndGetSession(user);
         product = api.getProductInfo(1);
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void emptyBasket() {
+    public void emptyBasket() throws InterruptedException {
         api.clearBasket(session);
     }
 
     /** Sinif bitəndə səbət təmizlənir, test məlumatı qalmır. */
     @AfterClass(alwaysRun = true)
-    public void clearBasketAfterClass() {
+    public void clearBasketAfterClass() throws InterruptedException {
         if (session != null) {
             api.clearBasket(session);
         }
     }
 
     @Test(groups = "regression", description = "GET /rest/basket/{id}")
-    public void getBasketTest() {
+    public void getBasketTest() throws InterruptedException {
         api.getBasket(session).then()
                 .statusCode(200)
                 .body("status", equalTo("success"))
@@ -48,7 +48,7 @@ public class BasketApiTests extends BaseTest {
     }
 
     @Test(groups = "regression", description = "POST /api/BasketItems")
-    public void addItemToBasketTest() {
+    public void addItemToBasketTest() throws InterruptedException {
         api.addToBasket(session, product.id(), 1).then()
                 .statusCode(anyOf(is(200), is(201)))
                 .body("status", equalTo("success"))
@@ -60,7 +60,7 @@ public class BasketApiTests extends BaseTest {
     }
 
     @Test(groups = "regression", description = "PUT /api/BasketItems/{id}")
-    public void updateBasketItemQuantityTest() {
+    public void updateBasketItemQuantityTest() throws InterruptedException {
         int itemId = api.addToBasket(session, product.id(), 1).jsonPath().getInt("data.id");
 
         api.updateBasketItem(session, itemId, 3).then()
@@ -70,7 +70,7 @@ public class BasketApiTests extends BaseTest {
     }
 
     @Test(groups = "regression", description = "DELETE /api/BasketItems/{id}")
-    public void deleteBasketItemTest() {
+    public void deleteBasketItemTest() throws InterruptedException {
         Response added = api.addToBasket(session, product.id(), 1);
         int itemId = added.jsonPath().getInt("data.id");
 

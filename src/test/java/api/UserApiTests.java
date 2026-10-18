@@ -15,12 +15,12 @@ public class UserApiTests extends BaseTest {
     private TestUser existingUser;
 
     @BeforeClass(alwaysRun = true)
-    public void createUser() {
+    public void createUser() throws InterruptedException {
         existingUser = api.createUser();
     }
 
     @Test(groups = "regression", description = "POST /api/Users")
-    public void registerUserTest() {
+    public void registerUserTest() throws InterruptedException {
         TestUser newUser = TestDataGenerator.newUser();
 
         api.register(newUser.email(), newUser.password()).then()
@@ -31,7 +31,7 @@ public class UserApiTests extends BaseTest {
     }
 
     @Test(groups = {"smoke", "regression"}, description = "POST /rest/user/login (valid)")
-    public void loginWithValidCredentialsTest() {
+    public void loginWithValidCredentialsTest() throws InterruptedException {
         api.login(existingUser.email(), existingUser.password()).then()
                 .statusCode(200)
                 .time(lessThan(5000L))
@@ -41,7 +41,7 @@ public class UserApiTests extends BaseTest {
     }
 
     @Test(groups = "regression", description = "POST /rest/user/login (yanlış parol, negative)")
-    public void loginWithInvalidPasswordTest() {
+    public void loginWithInvalidPasswordTest() throws InterruptedException {
         api.login(existingUser.email(), "YanlisParol!999").then()
                 .statusCode(401);
     }
