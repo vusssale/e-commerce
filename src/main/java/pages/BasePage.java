@@ -23,7 +23,7 @@ public abstract class BasePage {
     }
 
     protected WebElement waitVisible(By locator) throws InterruptedException {
-        Thread.sleep(Constants.ActionTimeout/2);
+        Thread.sleep(Constants.ActionTimeout);
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 

@@ -1,5 +1,6 @@
 package pages;
 
+import constants.Constants;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
@@ -49,6 +50,7 @@ public class HomePage extends BasePage {
         driver.navigate().refresh();
         waitVisible(PRODUCT_CARD);
         dismissOverlays();
+        Thread.sleep(Constants.ActionTimeout);
         return this;
     }
 
@@ -59,6 +61,7 @@ public class HomePage extends BasePage {
         driver.navigate().refresh();
         waitVisible(PRODUCT_CARD);
         dismissOverlays();
+        Thread.sleep(Constants.ActionTimeout);
         return this;
     }
 
